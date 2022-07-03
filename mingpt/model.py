@@ -72,11 +72,8 @@ class CausalSelfAttention(nn.Module):
         att = att.masked_fill(self.mask[:,:,:T,:T] == 0, float('-inf'))
         att = F.softmax(att, dim=-1)
         att = self.attn_drop(att)
-        y = att @ v # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        #y = torch.einsum('ijkl,ijlm->ijkm',[att, v]) # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        #y = y.transpose(1, 2).contiguous().view(B, T, C) # re-assemble all head outputs side by side
-        y = y.contiguous().view(B, T, C) # re-assemble all head outputs side by side
-
+        y = torch.einsum('ijkl,ijlm->ijkm',[att, v]) # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
+        y = y.transpose(1, 2).contiguous().view(B, T, C) # re-assemble all head outputs side by side
         # output projection
         y = self.resid_drop(self.proj(y))
         return y
