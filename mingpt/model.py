@@ -77,6 +77,31 @@ class CausalSelfAttention(nn.Module):
         y = self.resid_drop(self.proj(y))
         return y
 
+class TorchCausalSelfAttention(nn.Module):
+    """
+    Trying to replicate Karpathy's CausalSelfAttention with PyTorchs nn.MultiheadAttention
+    """    
+    def __init__(self, config):
+        assert config.n_embd % config.n_head == 0
+        self.attn = nn.MultiheadAttention(config.n_embd, config.n_head, 
+                                        dropout=config.attn_pdrop,
+                                        batch_first=True)    
+        # output projection
+        self.proj = nn.Linear(config.n_embd, config.n_embd)
+        self.resid_drop = nn.Dropout(config.resid_pdrop)           
+        # causal mask to ensure that attention is only applied to the left in the input sequence
+        self.register_buffer("mask", torch.tril(torch.ones(config.block_size, config.block_size))
+                                     .view(1, 1, config.block_size, config.block_size))
+    
+    def forward(self, x):
+        y = self.attn(x, x, x, need_weights=False)
+        # output projection
+        y = self.resid_drop(self.proj(y))
+        return y
+                                         
+
+
+
 class Block(nn.Module):
     """ an unassuming Transformer block """
 
@@ -84,7 +109,7 @@ class Block(nn.Module):
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.attn = CausalSelfAttention(config)
+        self.attn = TorchCausalSelfAttention(config)        
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
             nn.GELU(),
