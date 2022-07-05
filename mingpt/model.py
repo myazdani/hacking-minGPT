@@ -82,6 +82,7 @@ class TorchCausalSelfAttention(nn.Module):
     Trying to replicate Karpathy's CausalSelfAttention with PyTorchs nn.MultiheadAttention
     """    
     def __init__(self, config):
+        super().__init__()
         assert config.n_embd % config.n_head == 0
         self.attn = nn.MultiheadAttention(config.n_embd, config.n_head, 
                                         dropout=config.attn_pdrop,
@@ -109,7 +110,7 @@ class Block(nn.Module):
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.attn = CausalSelfAttention(config)        
+        self.attn = TorchCausalSelfAttention(config)        
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
             nn.GELU(),
