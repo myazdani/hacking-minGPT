@@ -94,7 +94,7 @@ class TorchCausalSelfAttention(nn.Module):
                                      .view(1, 1, config.block_size, config.block_size))
     
     def forward(self, x):
-        y = self.attn(x, x, x, need_weights=False)
+        y = self.attn(x, x, x, need_weights=False, attn_mask=self.mask)
         # output projection
         y = self.resid_drop(self.proj(y))
         return y
@@ -109,7 +109,7 @@ class Block(nn.Module):
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.attn = TorchCausalSelfAttention(config)        
+        self.attn = CausalSelfAttention(config)        
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
             nn.GELU(),
