@@ -95,7 +95,8 @@ class TorchCausalSelfAttention(nn.Module):
                                      .view(1, 1, config.block_size, config.block_size))
     
     def forward(self, x):
-        y, _ = self.attn(x, x, x, need_weights=False, attn_mask=self.mask.squeeze())
+        B, T, C = x.size() # batch size, sequence length, embedding dimensionality (n_embd)
+        y, _ = self.attn(x, x, x, need_weights=False, attn_mask=self.mask[:,:,:T,:T].squeeze())
         # output projection
         y = self.resid_drop(self.proj(y))
         return y
