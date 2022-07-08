@@ -111,7 +111,10 @@ class Block(nn.Module):
         super().__init__()
         self.ln1 = nn.LayerNorm(config.n_embd)
         self.ln2 = nn.LayerNorm(config.n_embd)
-        self.attn = TorchCausalSelfAttention(config)        
+        if hasattr(config, 'use_torch_attention') and config.use_torch_attention:
+            self.attn = TorchCausalSelfAttention(config)        
+        else:
+            self.attn = CausalSelfAttention(config)
         self.mlp = nn.Sequential(
             nn.Linear(config.n_embd, 4 * config.n_embd),
             nn.GELU(),
