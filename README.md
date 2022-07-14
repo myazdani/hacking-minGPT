@@ -2,7 +2,7 @@
 # Hacking minGPT
 
 
-Andrej Karpathy's minimal re-implementaition of GPT is an excellent educational resource. This fork is exploration of hacking the basics of the architecture on various toy datasets. 
+Andrej Karpathy's minimal re-implementaition of GPT is an excellent educational resource. This fork hacks the architecture on different toy tasks.
 
 ### License
 
