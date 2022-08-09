@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 from position_embedding import PositionEmbedding
 from token_embedding import TokenEmbedding
+import numpy as np
 
 
 class SingleQueryAttention(nn.Module):
@@ -20,7 +21,7 @@ class SingleQueryAttention(nn.Module):
         k = self.key(context_tokens).T
         v = self.value(context_tokens).T
 
-        att = q.T @ k
+        att = q.T @ k / np.sqrt(self.atten_dim)
         att = F.softmax(att, dim=-1)
         v = v @ att
         return v.T
