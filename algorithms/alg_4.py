@@ -9,6 +9,7 @@ from alg_3 import SingleQueryAttention
 
 
 class Attention(SingleQueryAttention):
+    ## TODO : clean up attention mask specification API
     def __init__(self, input_dim, atten_dim, output_dim, **kwargs):
         super().__init__(input_dim, atten_dim, output_dim, **kwargs)
         # self.register_buffer("masked_bias", torch.tensor(-1e4))
